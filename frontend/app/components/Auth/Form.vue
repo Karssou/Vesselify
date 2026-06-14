@@ -2,6 +2,8 @@
 import * as z from "zod";
 import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
+const { loginUser, registerUser } = useAuth();
+
 const isLogin = ref(true);
 
 const fields = computed<AuthFormField[]>(() => {
@@ -71,13 +73,11 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   const endpoint = isLogin.value ? "/auth/login" : "/auth/signup";
 
   try {
-    const response = await $fetch(`http://localhost:3333${endpoint}`, {
-      method: "POST",
-      body: payload.data,
-    });
-
-    console.log("Success:", response);
-    // TODO: Stocker le token d'authentification (session/cookie) et rediriger
+    if (isLogin.value) {
+      await loginUser(payload.data);
+    } else {
+      await registerUser(payload.data);
+    }
   } catch (error) {
     console.error("Authentication error:", error);
   }

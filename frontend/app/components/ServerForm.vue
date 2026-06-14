@@ -99,8 +99,9 @@ const resetForm = () => {
         >
           <code
             class="text-xs font-mono text-primary break-all select-all mr-2"
-            >{{ serverToken }}</code
           >
+            {{ serverToken }}
+          </code>
           <UButton
             :icon="isCopied ? 'i-lucide-check' : 'i-lucide-copy'"
             :color="isCopied ? 'success' : 'neutral'"
@@ -117,11 +118,11 @@ const resetForm = () => {
           class="space-y-4"
           @submit="onSubmit"
         >
-          <UFormGroup
+          <UFormField
             label="Nom du serveur"
             name="name"
             required
-            description="Un nom clair (ex: VPS-Prod-Hetzner)"
+            description="Un nom clair pour t'y retrouver (ex: VPS-Prod-Hetzner)"
           >
             <UInput
               v-model="state.name"
@@ -129,13 +130,13 @@ const resetForm = () => {
               icon="i-lucide-server"
               class="w-full"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup
+          <UFormField
             label="Adresse IP ou Domaine"
             name="ipAddress"
             required
-            description="L'IP publique ou le sous-domaine de ta machine"
+            description="L'IP publique ou le sous-domaine pointant vers la machine"
           >
             <UInput
               v-model="state.ipAddress"
@@ -143,15 +144,21 @@ const resetForm = () => {
               icon="i-lucide-globe"
               class="w-full"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup label="Description (Optionnel)" name="description">
+          <UFormField
+            label="Description (Optionnel)"
+            name="description"
+            description="Détails sur l'usage de cette machine"
+          >
             <UTextarea
               v-model="state.description"
-              placeholder="Serveur dédié à l'hébergement des outils internes..."
+              placeholder="Serveur dédié à l'hébergement des outils internes et apps de test..."
               class="w-full"
+              :rows="3"
+              :autoresize="false"
             />
-          </UFormGroup>
+          </UFormField>
 
           <div
             class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800"
