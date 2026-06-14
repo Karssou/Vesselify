@@ -32,6 +32,43 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class ServerSchema extends BaseModel {
+  static $columns = ['agentToken', 'cpuCores', 'cpuModel', 'createdAt', 'description', 'dockerVersion', 'id', 'ipAddress', 'lastPingAt', 'name', 'osName', 'osVersion', 'ramTotal', 'status', 'updatedAt', 'userId'] as const
+  $columns = ServerSchema.$columns
+  @column()
+  declare agentToken: string
+  @column()
+  declare cpuCores: number | null
+  @column()
+  declare cpuModel: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column()
+  declare dockerVersion: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ipAddress: string
+  @column.dateTime()
+  declare lastPingAt: DateTime | null
+  @column()
+  declare name: string
+  @column()
+  declare osName: string | null
+  @column()
+  declare osVersion: string | null
+  @column()
+  declare ramTotal: bigint | number | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
   $columns = UserSchema.$columns
