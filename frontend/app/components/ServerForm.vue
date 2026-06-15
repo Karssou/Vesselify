@@ -13,7 +13,7 @@ const domainRegex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;
 // 1. Schéma de validation corrigé et robuste
 const schema = z.object({
   name: z.string().min(3, "Le nom doit faire au moins 3 caractères"),
-  ipAddress: z.cidrv4(),
+  ipAddress: z.ipv4("Adresse IP invalide"),
   description: z.string().optional(),
 });
 
@@ -29,15 +29,12 @@ const state = reactive({
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   isLoading.value = true;
   try {
-    const response = await $fetch<{ token: string }>(
-      "http://localhost:3333/api/servers",
-      {
-        method: "POST",
-        body: event.data,
-      },
-    );
+    const response: any = await $fetch("/api/servers/add", {
+      method: "POST",
+      body: event.data,
+    });
 
-    serverToken.value = response.token;
+    serverToken.value = response;
   } catch (error) {
     console.error("Erreur création serveur:", error);
   } finally {
@@ -45,7 +42,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
 }
 
-// Copie native du Token
 async function copyToken() {
   if (!serverToken.value) return;
   try {

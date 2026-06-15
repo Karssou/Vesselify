@@ -14,4 +14,10 @@ export interface ApiDefinition {
       show: typeof routes['account.profile.show']
     }
   }
+  servers: {
+    servers: {
+      store: typeof routes['servers.servers.store']
+      list: typeof routes['servers.servers.list']
+    }
+  }
 }

@@ -55,4 +55,28 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile_controller').default['show']>>>
     }
   }
+  'servers.servers.store': {
+    methods: ["POST"]
+    pattern: '/servers/create'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/server').createServerValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/server').createServerValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/servers_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/servers_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'servers.servers.list': {
+    methods: ["GET","HEAD"]
+    pattern: '/servers'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/servers_controller').default['list']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/servers_controller').default['list']>>>
+    }
+  }
 }

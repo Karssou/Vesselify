@@ -20,7 +20,7 @@ export default class Server extends BaseModel {
   @column()
   declare description: string | null
 
-  @column()
+  @column({ serializeAs: null })
   declare agentToken: string
 
   @column()

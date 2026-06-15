@@ -8,16 +8,21 @@ export type ScannedRoutes = {
     'auth.auth.login': { paramsTuple?: []; params?: {} }
     'auth.auth.logout': { paramsTuple?: []; params?: {} }
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'servers.servers.store': { paramsTuple?: []; params?: {} }
+    'servers.servers.list': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'servers.servers.list': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
+    'servers.servers.list': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'auth.auth.register': { paramsTuple?: []; params?: {} }
     'auth.auth.login': { paramsTuple?: []; params?: {} }
+    'servers.servers.store': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'auth.auth.logout': { paramsTuple?: []; params?: {} }

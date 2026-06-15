@@ -30,6 +30,18 @@ const routes = {
     tokens: [{"old":"/account/profile","type":0,"val":"account","end":""},{"old":"/account/profile","type":0,"val":"profile","end":""}],
     types: placeholder as Registry['account.profile.show']['types'],
   },
+  'servers.servers.store': {
+    methods: ["POST"],
+    pattern: '/servers/create',
+    tokens: [{"old":"/servers/create","type":0,"val":"servers","end":""},{"old":"/servers/create","type":0,"val":"create","end":""}],
+    types: placeholder as Registry['servers.servers.store']['types'],
+  },
+  'servers.servers.list': {
+    methods: ["GET","HEAD"],
+    pattern: '/servers',
+    tokens: [{"old":"/servers","type":0,"val":"servers","end":""}],
+    types: placeholder as Registry['servers.servers.list']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const API_URL = useRuntimeConfig().public.apiBaseUrl;
   const token = getCookie(event, "auth_token");
   try {
-    const data = await $fetch(`${API_URL}/storage/copy`, {
+    const data = await $fetch(`${API_URL}/servers/create`, {
       method: "POST",
       body: payload,
       headers: {

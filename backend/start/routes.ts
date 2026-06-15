@@ -31,3 +31,12 @@ router
   .as('account')
   .prefix('/account')
   .use(middleware.auth())
+
+router
+  .group(() => {
+    router.post('/create', [controllers.Servers, 'store'])
+    router.get('/', [controllers.Servers, 'list'])
+  })
+  .prefix('/servers')
+  .as('servers')
+  .use(middleware.auth())
