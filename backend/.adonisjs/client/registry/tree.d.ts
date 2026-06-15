@@ -20,4 +20,7 @@ export interface ApiDefinition {
       list: typeof routes['servers.servers.list']
     }
   }
+  agents: {
+    ping: typeof routes['agents.ping']
+  }
 }

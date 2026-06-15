@@ -2,14 +2,11 @@ import si from "systeminformation";
 
 export async function getServerMetrics() {
   try {
-    // On récupère plusieurs infos en même temps (données dynamiques)
     const cpuLoad = await si.currentLoad();
     const memory = await si.mem();
     const disk = await si.fsSize();
-
-    // On calcule les pourcentages proprement
     const metrics = {
-      cpuCurrentUsage: Math.round(cpuLoad.currentLoad), // % d'utilisation CPU global
+      cpuCurrentUsage: Math.round(cpuLoad.currentLoad),
       ram: {
         totalGb: (memory.total / 1024 / 1024 / 1024).toFixed(2),
         usedGb: (memory.used / 1024 / 1024 / 1024).toFixed(2),
@@ -22,17 +19,39 @@ export async function getServerMetrics() {
       },
     };
 
-    console.log(`\n📊 Métriques Serveur :`);
-    console.log(`🖥️  CPU : ${metrics.cpuCurrentUsage}%`);
-    console.log(
-      `🧠 RAM : ${metrics.ram.usedGb}GB / ${metrics.ram.totalGb}GB (${metrics.ram.usagePercentage}%)`,
-    );
-    console.log(
-      `💾 Disque : ${metrics.disk.usedGb}GB / ${metrics.disk.sizeGb}GB (${metrics.disk.usagePercentage}%)`,
-    );
-
     return metrics;
   } catch (error) {
-    console.error("❌ Impossible de récupérer les métriques système :", error);
+    console.error("Impossible de récupérer les métriques système :", error);
+  }
+}
+
+export async function getStaticSystemInfo() {
+  try {
+    const os = await si.osInfo();
+    const cpu = await si.cpu();
+    const mem = await si.mem();
+
+
+    let dockerVersion = "Non installé";
+    try {
+      const dockerData = await si.dockerInfo();
+      // systeminformation renvoie la version sous forme de chaîne (ex: "24.0.7")
+      if (dockerData && dockerData.serverVersion) {
+        dockerVersion = dockerData.serverVersion;
+      }
+    } catch {
+      dockerVersion = "Inaccessible / Non installé";
+    }
+
+    return {
+      osName: os.distro,
+      osVersion: os.release,
+      cpuModel: `${cpu.manufacturer} ${cpu.brand}`,
+      cpuCores: cpu.cores,
+      ramTotal: mem.total,
+      dockerVersion,
+    };
+  } catch {
+    return null;
   }
 }

@@ -79,4 +79,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/servers_controller').default['list']>>>
     }
   }
+  'agents.ping': {
+    methods: ["POST"]
+    pattern: '/agent/ping'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/agents_controller').default['ping']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/agents_controller').default['ping']>>>
+    }
+  }
 }

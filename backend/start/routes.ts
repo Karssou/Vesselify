@@ -40,3 +40,5 @@ router
   .prefix('/servers')
   .as('servers')
   .use(middleware.auth())
+
+router.post('/agent/ping', [controllers.Agents, 'ping'])

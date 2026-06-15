@@ -42,6 +42,12 @@ const routes = {
     tokens: [{"old":"/servers","type":0,"val":"servers","end":""}],
     types: placeholder as Registry['servers.servers.list']['types'],
   },
+  'agents.ping': {
+    methods: ["POST"],
+    pattern: '/agent/ping',
+    tokens: [{"old":"/agent/ping","type":0,"val":"agent","end":""},{"old":"/agent/ping","type":0,"val":"ping","end":""}],
+    types: placeholder as Registry['agents.ping']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  Agents: () => import('#controllers/agents_controller'),
   Auth: () => import('#controllers/auth_controller'),
   Profile: () => import('#controllers/profile_controller'),
   Servers: () => import('#controllers/servers_controller'),

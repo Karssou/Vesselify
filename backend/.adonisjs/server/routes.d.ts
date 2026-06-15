@@ -10,6 +10,7 @@ export type ScannedRoutes = {
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'servers.servers.store': { paramsTuple?: []; params?: {} }
     'servers.servers.list': { paramsTuple?: []; params?: {} }
+    'agents.ping': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
@@ -23,6 +24,7 @@ export type ScannedRoutes = {
     'auth.auth.register': { paramsTuple?: []; params?: {} }
     'auth.auth.login': { paramsTuple?: []; params?: {} }
     'servers.servers.store': { paramsTuple?: []; params?: {} }
+    'agents.ping': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'auth.auth.logout': { paramsTuple?: []; params?: {} }
