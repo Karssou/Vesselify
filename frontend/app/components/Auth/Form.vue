@@ -85,9 +85,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div
-    class="flex min-h-screen flex-col items-center justify-center gap-4 p-4 bg-gray-50 dark:bg-gray-900"
-  >
+  <div class="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"

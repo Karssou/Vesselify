@@ -11,7 +11,8 @@ async function getServers() {
 
 <template>
   <UApp>
-    <ServerForm />
+    <AuthForm />
+
     <UButton loading-auto label="Get servers" @click="getServers" />
     <pre>{{ servers }}</pre>
   </UApp>

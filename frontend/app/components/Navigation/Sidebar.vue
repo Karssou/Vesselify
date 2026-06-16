@@ -172,7 +172,7 @@ const items: NavigationMenuItem[][] = [
           :items="items[1]"
           orientation="vertical"
           :ui="{
-            link: 'py-2 text-sm text-neutral-400 hover:text-white',
+            link: 'py-2 text-sm',
           }"
         />
       </div>
