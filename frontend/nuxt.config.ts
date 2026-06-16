@@ -2,9 +2,18 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
-  modules: ["@nuxt/ui", "@pinia/nuxt"],
+  modules: ["@nuxt/ui", "@pinia/nuxt", "@nuxtjs/google-fonts"],
 
   css: ["~/assets/css/main.css"],
+
+  googleFonts: {
+    download: true,
+    inject: true,
+    families: {
+      Inter: [400, 500, 600, 700],
+      "JetBrains Mono": [400, 500, 700],
+    },
+  },
 
   runtimeConfig: {
     public: {

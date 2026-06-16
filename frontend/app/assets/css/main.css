@@ -1,13 +1,105 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/inter-font.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../fonts/mono-font.woff2") format("woff2");
+}
+
 @theme {
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Primary */
+  --color-primary-50: #f5f3ff;
+  --color-primary-100: #edd8ff;
+  --color-primary-200: #ddd6fe;
+  --color-primary-300: #c7d2fe;
+  --color-primary-400: #a78bfa;
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #7c3aed;
+  --color-primary-700: #6d28d9;
+  --color-primary-800: #5b21b6;
+  --color-primary-900: #4c1d95;
+  --color-primary-950: #2e1065;
+
+  --color-secondary-50: #ecfdf5;
+  --color-secondary-100: #d1fae5;
+  --color-secondary-200: #a7f3d0;
+  --color-secondary-300: #6ee7b7;
+  --color-secondary-400: #34d399;
+  --color-secondary-500: #37cd8f;
+  --color-secondary-600: #059669;
+  --color-secondary-700: #047857;
+  --color-secondary-800: #065f46;
+  --color-secondary-900: #064e3b;
+  --color-secondary-950: #022c22;
+
+  /* Tertiary */
+  --color-tertiary-50: #fff7ed;
+  --color-tertiary-100: #ffedd5;
+  --color-tertiary-200: #fed7aa;
+  --color-tertiary-300: #fdba74;
+  --color-tertiary-400: #f97316;
+  --color-tertiary-500: #b26425;
+  --color-tertiary-600: #ea580c;
+  --color-tertiary-700: #c2410c;
+  --color-tertiary-800: #9a3412;
+  --color-tertiary-900: #7c2d12;
+  --color-tertiary-950: #431407;
+
+  /* Neutral */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f4f4f5;
+  --color-neutral-200: #e4e4e7;
+  --color-neutral-300: #d4d4d8;
+  --color-neutral-400: #a1a1aa;
+  --color-neutral-500: #71717a;
+  --color-neutral-600: #52525b;
+  --color-neutral-700: #3f3f46;
+  --color-neutral-800: #27272a;
+  --color-neutral-900: #18181b;
+  --color-neutral-950: #09090b;
+}
+:root {
+  --ui-primary: var(--color-primary-500);
+
+  /* Layout */
+  --ui-bg: #ffffff;
+  --ui-surface: var(--color-neutral-50);
+  --ui-surface-elevated: #ffffff;
+
+  /* Borders */
+  --ui-border: var(--color-neutral-200);
+
+  /* Text */
+  --ui-text: var(--color-neutral-950);
+  --ui-text-muted: var(--color-neutral-500);
+
+  /* States */
+  --ui-bg-elevated: var(--color-neutral-100);
 }
 
-/* :root {
-  --ui-bg: #dddddd;
-}
+.dark {
+  --ui-primary: var(--color-primary-500);
 
-:dark {
-  --ui-bg: #272727;
-} */
+  /* Layout */
+  --ui-bg: #0d0d10;
+  --ui-surface: #161619;
+  --ui-surface-elevated: #1d1d21;
+
+  /* Borders */
+  --ui-border: var(--color-neutral-800);
+
+  /* Text */
+  --ui-text: #ffffff;
+  --ui-text-muted: var(--color-neutral-400);
+
+  /* States */
+  --ui-bg-elevated: #222228;
+}
