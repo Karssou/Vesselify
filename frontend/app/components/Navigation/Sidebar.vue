@@ -4,6 +4,11 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 const selectItems = ref(["Global Fleet", "Staging Fleet", "NohamDrive Fleet"]);
 const value = ref("Global Fleet");
 
+function createNewFleet() {
+  console.log("Ouvrir le formulaire de création de fleet");
+  // Exemple d'action : ouvrir un modal ou changer d'onglet
+}
+
 const items: NavigationMenuItem[][] = [
   [
     {
@@ -13,7 +18,7 @@ const items: NavigationMenuItem[][] = [
     },
     {
       label: "Servers",
-      icon: "i-lucide-inbox",
+      icon: "material-symbols:dns-outline",
     },
     {
       label: "Alerts",
@@ -27,7 +32,7 @@ const items: NavigationMenuItem[][] = [
   ],
   [
     {
-      label: "Feedback",
+      label: "Documentation",
       icon: "i-lucide-message-circle",
       to: "https://github.com/nuxt-ui-templates/dashboard",
       target: "_blank",
@@ -140,6 +145,18 @@ const items: NavigationMenuItem[][] = [
             </p>
           </div>
         </template>
+        <template #content-bottom>
+          <div class="p-1 border-t border-default">
+            <UButton
+              label="New Fleet"
+              icon="material-symbols:add"
+              color="primary"
+              variant="ghost"
+              block
+              @click="createNewFleet"
+            />
+          </div>
+        </template>
       </USelectMenu>
       <UNavigationMenu
         :collapsed="collapsed"
@@ -147,22 +164,29 @@ const items: NavigationMenuItem[][] = [
         orientation="vertical"
         color="neutral"
         :ui="{
-          link: 'py-2.5 text-md rounded transition-all hover:text-highlighted',
+          link: collapsed
+            ? 'p-2.5 aspect-square flex items-center justify-center rounded-lg transition-all'
+            : 'py-2.5 px-3 text-md rounded-lg transition-all hover:text-highlighted',
           linkLabel: 'ml-1',
-          linkLeadingIcon: collapsed ? '' : 'size-6 mr-2',
+          linkLeadingIcon: collapsed ? 'shrink-0 size-6' : 'size-6 mr-2',
         }"
-      >
-      </UNavigationMenu>
+      />
     </template>
     <template #footer="{ collapsed }">
       <div class="w-full flex flex-col gap-4">
         <UButton
+          @click="navigateTo('/add-server')"
           size="lg"
           block
-          class="bg-primary font-bold py-2.5 shadow-[0px_0px_20px_10px] shadow-primary/10 hover:opacity-90"
+          :square="collapsed"
+          class="bg-primary font-bold shadow-[0px_0px_20px_10px] shadow-primary/10 hover:opacity-90"
+          :class="collapsed ? '' : 'py-2.5'"
         >
           <template #leading>
-            <UIcon name="material-symbols:add" class="size-5 font-bold" />
+            <UIcon
+              name="material-symbols:add"
+              class="size-5 font-bold shrink-0"
+            />
           </template>
           <span v-if="!collapsed" class="text-sm">New Instance</span>
         </UButton>

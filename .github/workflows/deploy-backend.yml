@@ -1,0 +1,65 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "backend/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy backend via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_URL }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            # Couleurs
+            RED='\033[0;31m'
+            GREEN='\033[0;32m'
+            YELLOW='\033[1;33m'
+            NC='\033[0m'
+            REPO_PATH="NohamDrive"
+
+            echo -e "${YELLOW}=== Début du déploiement du backend AdonisJS ===${NC}"
+            if [ -d "$REPO_PATH" ]; then
+              echo -e "${GREEN}✅ Dépôt trouvé. Mise à jour en cours...${NC}"
+              cd "$REPO_PATH" || { echo -e "${RED}❌ Erreur : Impossible d'entrer dans $REPO_PATH${NC}"; exit 1; }
+              git fetch origin || { echo -e "${RED}❌ Erreur lors du fetch${NC}"; exit 1; }
+              git checkout main || { echo -e "${RED}❌ Erreur lors du checkout${NC}"; exit 1; }
+              git pull origin main || { echo -e "${RED}❌ Erreur lors du pull${NC}"; exit 1; }
+            else
+              echo -e "${YELLOW}⚠️  Dépôt non trouvé. Clonage en cours...${NC}"
+              git clone "git@github.com:Karssou/Vesselify.git" || { echo -e "${RED}❌ Erreur lors du clone${NC}"; exit 1; }
+              cd "$REPO_PATH" || { echo -e "${RED}❌ Erreur : Impossible d'entrer dans $REPO_PATH${NC}"; exit 1; }
+            fi
+
+            # Build et redémarrage du conteneur backend
+            echo -e "${YELLOW}🐳 Construction de l'image Docker pour AdonisJS...${NC}"
+            docker compose -f docker-compose.yml build --no-cache || { echo -e "${RED}❌ Erreur lors du build Docker${NC}"; exit 1; }
+
+            echo -e "${YELLOW}🔄 Redémarrage du conteneur backend...${NC}"
+            docker compose -f docker-compose.yml down || { echo -e "${RED}❌ Erreur lors de l'arrêt du conteneur${NC}"; exit 1; }
+            docker compose -f docker-compose.yml up -d --remove-orphans || { echo -e "${RED}❌ Erreur lors du démarrage du conteneur${NC}"; exit 1; }
+
+            echo -e "${YELLOW}🗄️  Exécution des migrations de base de données...${NC}"
+            # On cible le dossier du backend si nécessaire dans le container (ex: node ace migration:run --force)
+            docker compose -f docker-compose.yml exec -T backend node ace migration:run --force || echo -e "${YELLOW}⚠️  Note: Aucune nouvelle migration ou erreur ignorée (vérifie tes logs si besoin)${NC}"
+
+            # Nettoyage
+            echo -e "${YELLOW}🧹 Nettoyage des images Docker inutilisées...${NC}"
+            docker image prune -f || { echo -e "${RED}❌ Erreur lors du nettoyage${NC}"; exit 1; }
+
+            # Vérification finale
+            if docker ps | grep -q "backend"; then
+              echo -e "${GREEN}===============================================${NC}"
+              echo -e "${GREEN}✨ Déploiement AdonisJS terminé avec succès ! ✨${NC}"
+              echo -e "${GREEN}===============================================${NC}"
+            else
+              echo -e "${RED}❌ ÉCHEC : Le conteneur backend n'a pas survécu au démarrage.${NC}"
+              exit 1
+            fi

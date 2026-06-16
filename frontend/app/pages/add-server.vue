@@ -246,6 +246,7 @@ async function startWaiting() {
               <UButton
                 class="mt-8 font-bold flex items-center justify-center gap-2 text-sm uppercase tracking-wide py-2 shadow-[0px_0px_20px_10px] shadow-primary/10"
                 block
+                @click="navigateTo('/dashboard')"
               >
                 Accéder au dashboard
                 <UIcon
