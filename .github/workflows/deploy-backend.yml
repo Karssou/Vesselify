@@ -24,7 +24,7 @@ jobs:
             GREEN='\033[0;32m'
             YELLOW='\033[1;33m'
             NC='\033[0m'
-            REPO_PATH="NohamDrive"
+            REPO_PATH="Vesselify"
 
             echo -e "${YELLOW}=== Début du déploiement du backend AdonisJS ===${NC}"
             if [ -d "$REPO_PATH" ]; then
