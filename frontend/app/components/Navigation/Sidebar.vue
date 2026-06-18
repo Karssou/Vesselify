@@ -166,7 +166,7 @@ const items: NavigationMenuItem[][] = [
         :ui="{
           link: collapsed
             ? 'p-2.5 aspect-square flex items-center justify-center rounded-lg transition-all'
-            : 'py-2.5 px-3 text-md rounded-lg transition-all hover:text-highlighted',
+            : 'py-4 px-3 text-md rounded-lg transition-all hover:text-highlighted',
           linkLabel: 'ml-1',
           linkLeadingIcon: collapsed ? 'shrink-0 size-6' : 'size-6 mr-2',
         }"

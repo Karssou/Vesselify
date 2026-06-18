@@ -69,7 +69,7 @@
 :root {
   --ui-primary: var(--color-primary-500);
   --ui-secondary: var(--color-secondary-500);
-  --ui-tiertiary: var(--color-tiertiary-500);
+  --ui-tertiary: var(--color-tiertiary-500);
   /* Layout */
   --ui-bg: #ffffff;
   --ui-surface: var(--color-neutral-50);

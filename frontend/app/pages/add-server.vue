@@ -61,6 +61,14 @@ async function startWaiting() {
 </script>
 
 <template>
+  <div class="fixed inset-0 pointer-events-none">
+    <div
+      class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[120px] rounded-full opacity-40"
+    ></div>
+    <div
+      class="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-secondary/5 blur-[120px] rounded-full opacity-40"
+    ></div>
+  </div>
   <UContainer class="max-w-2xl py-12">
     <UStepper
       :items="[
@@ -73,7 +81,7 @@ async function startWaiting() {
       :disabled="true"
     />
 
-    <UCard class="mt-8">
+    <UCard class="mt-8 bg-(--ui-surface)">
       <Transition name="step-fade" mode="out-in">
         <div :key="step">
           <template v-if="step === 1">
@@ -89,7 +97,7 @@ async function startWaiting() {
                 label="Nom du serveur"
                 name="name"
                 required
-                description="Un nom clair pour t'y retrouver (ex: VPS-Prod-Hetzner)"
+                description="Un nom clair pour t'y retrouver"
                 class="space-y-2"
               >
                 <UInput
@@ -126,7 +134,8 @@ async function startWaiting() {
                   placeholder="Serveur dédié à l'hébergement des outils internes et apps de test..."
                   class="w-full"
                   :rows="3"
-                  :autoresize="false"
+                  :maxrows="5"
+                  :autoresize="true"
                 />
               </UFormField>
 

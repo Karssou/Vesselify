@@ -6,4 +6,6 @@ definePageMeta({
 
 <template>
   <h1>Le dashboard</h1>
+  <DashboardCardsContainer />
+  <ChartsDonut label="Salut" :value="70" />
 </template>

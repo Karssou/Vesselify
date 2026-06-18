@@ -27,4 +27,16 @@ export default defineNuxtConfig({
     // Cached for 1 hour
     "/api/*": { cache: { maxAge: 60 * 60 } },
   },
+
+  app: {
+    head: {
+      link: [
+        {
+          rel: "icon",
+          type: "image/x-icon",
+          href: "/favicon.ico",
+        },
+      ],
+    },
+  },
 });
