@@ -1,6 +1,7 @@
 name: Deploy Backend to VPS
 
 on:
+  workflow_dispatch: 
   push:
     branches: ["main"]
     paths:
@@ -23,7 +24,7 @@ jobs:
             GREEN='\033[0;32m'
             YELLOW='\033[1;33m'
             NC='\033[0m'
-            REPO_PATH="NohamDrive"
+            REPO_PATH="Vesselify"
 
             echo -e "${YELLOW}=== Début du déploiement du backend AdonisJS ===${NC}"
             if [ -d "$REPO_PATH" ]; then
@@ -48,7 +49,7 @@ jobs:
 
             echo -e "${YELLOW}🗄️  Exécution des migrations de base de données...${NC}"
             # On cible le dossier du backend si nécessaire dans le container (ex: node ace migration:run --force)
-            docker compose -f docker-compose.yml exec -T backend node ace migration:run --force || echo -e "${YELLOW}⚠️  Note: Aucune nouvelle migration ou erreur ignorée (vérifie tes logs si besoin)${NC}"
+            docker compose -f docker-compose.backend.yml exec -T backend node build/ace.js migration:run --force || echo -e
 
             # Nettoyage
             echo -e "${YELLOW}🧹 Nettoyage des images Docker inutilisées...${NC}"
