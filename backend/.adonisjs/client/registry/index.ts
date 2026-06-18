@@ -42,6 +42,12 @@ const routes = {
     tokens: [{"old":"/servers","type":0,"val":"servers","end":""}],
     types: placeholder as Registry['servers.servers.list']['types'],
   },
+  'servers.servers.get': {
+    methods: ["GET","HEAD"],
+    pattern: '/servers/:id',
+    tokens: [{"old":"/servers/:id","type":0,"val":"servers","end":""},{"old":"/servers/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['servers.servers.get']['types'],
+  },
   'agents.ping': {
     methods: ["POST"],
     pattern: '/agent/ping',

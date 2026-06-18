@@ -5,9 +5,7 @@ import { DateTime } from 'luxon'
 import Server from '#models/server'
 
 class WsService {
-
   public io: SocketIOServer | null = null
-
 
   public boot() {
     // Si le serveur est déjà lancé, on ne fait rien
@@ -15,7 +13,6 @@ class WsService {
 
     // On récupère le serveur Node natif sous-jacent d'Adonis v6
     const httpServer = server.getNodeServer()
-
 
     this.io = new SocketIOServer(httpServer, {
       cors: {
@@ -29,16 +26,13 @@ class WsService {
     this.listen()
   }
 
-
   private listen() {
     if (!this.io) return
 
     this.io.on('connection', async (socket) => {
-
       const token =
         socket.handshake.headers['authorization']?.split(' ')[1] || socket.handshake.auth.token
       const serverId = socket.handshake.query.serverId as string
-
 
       if (!token || !serverId) {
         socket.disconnect()

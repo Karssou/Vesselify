@@ -39,4 +39,18 @@ export default class ServersController {
       timestamp: DateTime.now(),
     })
   }
+
+  async get({ response, request, auth }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    const { id: serverId } = request.params()
+
+    const server = await Server.query().where('userId', user.id).where('id', serverId)
+
+    response.ok({
+      success: true,
+      data: server,
+      timestamp: DateTime.now(),
+    })
+  }
 }

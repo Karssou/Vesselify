@@ -1,4 +1,6 @@
 import Docker from "dockerode";
+import { Socket } from "socket.io-client";
+import { PassThrough } from "stream";
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 
@@ -54,39 +56,66 @@ export async function restartContainer(containerId: string): Promise<boolean> {
 }
 
 /**
- * Récupère et affiche le flux de logs en continu d'un conteneur
+ * Récupère le flux de logs d'un conteneur et le renvoie sur le WebSocket
  */
-export async function streamContainerLogs(containerId: string) {
+export async function streamContainerLogs(containerId: string, socket: Socket) {
   try {
     const container = docker.getContainer(containerId);
 
-    // On demande à Docker le stream des logs (stdout = sorties normales, stderr = erreurs)
     const logStream = await container.logs({
-      follow: true, // Reste branché pour recevoir les futurs logs
+      follow: true,
       stdout: true,
       stderr: true,
-      tail: 20, // Récupère les 20 lignes précédentes au démarrage
+      tail: 50, // On envoie les 50 dernières lignes pour l'affichage initial
     });
+
+    const stdoutStream = new PassThrough();
+    const stderrStream = new PassThrough();
+
+    // Sépare proprement les flux sans corrompre les encodages de caractères
+    container.modem.demuxStream(logStream, stdoutStream, stderrStream);
 
     console.log(
-      `\n📺 Début du flux de logs pour [${containerId.substring(0, 12)}] :`,
+      `\n📺 Flux de logs activé pour [${containerId.substring(0, 12)}]`,
     );
 
-    // Docker multiplexe les logs (il ajoute des headers invisibles pour séparer stdout/stderr)
-    // Pour un test simple en console, on peut lire le buffer directement :
-    logStream.on("data", (chunk: Buffer) => {
-      // On nettoie un peu les caractères de contrôle spécifiques au protocole Docker
+    // Lecture du flux standard
+    stdoutStream.on("data", (chunk: Buffer) => {
+      socket.emit("container:logs:stream", {
+        containerId,
+        type: "stdout",
+        log: chunk.toString("utf8"),
+      });
+    });
+
+    // Lecture du flux d'erreur
+    stderrStream.on("data", (chunk: Buffer) => {
+      socket.emit("container:logs:stream", {
+        containerId,
+        type: "stderr",
+        log: chunk.toString("utf8"),
+      });
+    });
+
+    // Si le conteneur s'arrête en cours de route
+    logStream.on("end", () => {
+      socket.emit("container:logs:end", { containerId });
       console.log(
-        chunk.toString("utf8").replace(/[\u0000-\u001F\u007F-\u009F]/g, ""),
+        `🔌 Flux terminé pour le conteneur [${containerId.substring(0, 12)}]`,
       );
     });
 
-    logStream.on("end", () => {
-      console.log(
-        "🔌 Flux de logs terminé (le conteneur s'est arrêté ou la connexion a coupé).",
-      );
+    // TRÈS IMPORTANT : Si le socket se déconnecte, on coupe le stream Docker pour pas surcharger le processeur
+    socket.on("disconnect", () => {
+      logStream.pause();
+      stdoutStream.destroy();
+      stderrStream.destroy();
     });
   } catch (error) {
-    console.error("❌ Erreur lors de la récupération des logs :", error);
+    console.error("❌ Erreur lors du streaming des logs :", error);
+    socket.emit("container:logs:error", {
+      containerId,
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }

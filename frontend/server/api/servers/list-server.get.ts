@@ -12,16 +12,13 @@ export default defineEventHandler(async (event) => {
     });
   }
   try {
-    const data = await $fetch(
-      `${API_URL}/servers/19ab3998-f754-4a93-b729-b0de55778b57`,
-      {
-        method: "GET",
+    const data = await $fetch(`${API_URL}/servers/`, {
+      method: "GET",
 
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
     return data;
   } catch (error: any) {
     throw createError({

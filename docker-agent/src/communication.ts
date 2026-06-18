@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
-
 import { getServerMetrics, getStaticSystemInfo } from "./system";
+
+import { streamContainerLogs } from "./dockerActions";
 
 const BACKEND_URL = process.env.API_URL;
 const SERVER_ID = process.env.SERVER_ID;
@@ -30,6 +31,19 @@ export function initAgentCommunication() {
       socket.emit("agent:register", { serverId: SERVER_ID, ...staticInfo });
       console.log("Événement agent:register envoyé au backend !");
     }, 500);
+
+    socket.on(
+      "container:logs:request",
+      async (data: { containerId: string }) => {
+        if (!data.containerId) return;
+
+        console.log(
+          `Demande de logs reçue pour le conteneur: ${data.containerId}`,
+        );
+        // On lance le streaming en lui passant l'instance actuelle du socket
+        await streamContainerLogs(data.containerId, socket);
+      },
+    );
 
     const wsInterval = setInterval(async () => {
       if (socket.disconnected) {

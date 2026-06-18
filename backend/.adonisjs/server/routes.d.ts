@@ -10,15 +10,18 @@ export type ScannedRoutes = {
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'servers.servers.store': { paramsTuple?: []; params?: {} }
     'servers.servers.list': { paramsTuple?: []; params?: {} }
+    'servers.servers.get': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'agents.ping': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'servers.servers.list': { paramsTuple?: []; params?: {} }
+    'servers.servers.get': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'account.profile.show': { paramsTuple?: []; params?: {} }
     'servers.servers.list': { paramsTuple?: []; params?: {} }
+    'servers.servers.get': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'auth.auth.register': { paramsTuple?: []; params?: {} }

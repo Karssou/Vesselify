@@ -18,6 +18,7 @@ export interface ApiDefinition {
     servers: {
       store: typeof routes['servers.servers.store']
       list: typeof routes['servers.servers.list']
+      get: typeof routes['servers.servers.get']
     }
   }
   agents: {

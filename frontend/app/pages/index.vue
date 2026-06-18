@@ -2,7 +2,7 @@
 const servers = ref("");
 
 async function getServers() {
-  servers.value = await $fetch("/api/servers/get-server", {
+  servers.value = await $fetch("/api/servers/list-server", {
     method: "GET",
     credentials: "include",
   });

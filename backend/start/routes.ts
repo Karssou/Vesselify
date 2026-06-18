@@ -35,7 +35,10 @@ router
 router
   .group(() => {
     router.post('/create', [controllers.Servers, 'store'])
+
     router.get('/', [controllers.Servers, 'list'])
+
+    router.get('/:id', [controllers.Servers, 'get'])
   })
   .prefix('/servers')
   .as('servers')
