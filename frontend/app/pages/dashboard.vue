@@ -9,5 +9,5 @@ definePageMeta({
   <DashboardCardsContainer />
   <ChartsDonut label="Salut" :value="70" />
 
-  <DashboardCardsCPUMetrics :cpu-value="12.4" class="max-w-3xl" />
+  <DashboardCardsCPUMetrics class="max-w-3xl" />
 </template>

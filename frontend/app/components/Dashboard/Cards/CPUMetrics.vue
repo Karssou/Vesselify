@@ -1,143 +1,209 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { computed, ref } from "vue";
 
-// 1. Props pour passer les métriques reçues par ton WebSocket
-const props = withDefaults(
-  defineProps<{
-    cpuValue: number; // Le pourcentage de CPU actuel (ex: 12.4)
-    maxHistoryPoints?: number; // Nombre de points affichés sur le graph
-  }>(),
-  {
-    maxHistoryPoints: 20, // Garde les 20 derniers relevés à l'écran
-  },
-);
+const chartRef = ref();
 
-// 2. Historique des points pour dessiner le graphique (valeurs entre 0 et 100)
-const history = ref<number[]>([]);
-
-// Remplit le graphique initialement avec la valeur actuelle ou des 0
-onMounted(() => {
-  history.value = Array(props.maxHistoryPoints).fill(props.cpuValue);
-});
-
-// À chaque fois que la prop `cpuValue` change via ton WS, on met à jour l'historique
-watch(
-  () => props.cpuValue,
-  (newVal) => {
-    history.value.push(newVal);
-    if (history.value.length > props.maxHistoryPoints) {
-      history.value.shift(); // Enlève le plus vieux point pour faire défiler
-    }
-  },
-);
-
-// 3. CALCUL MAGIQUE DU CHEMIN SVG (Path)
-// Largeur SVG fixe = 100, Hauteur SVG fixe = 40 (calqué sur ton viewBox="0 0 100 40")
-const svgPaths = computed(() => {
-  const points = history.value;
-  const totalPoints = points.length;
-  if (totalPoints === 0) return { line: "", area: "", lastY: 20 };
-
-  const width = 100;
-  const height = 40;
-  const stepX = width / (props.maxHistoryPoints - 1);
-
-  // Construction de la suite de coordonnées X, Y
-  const coords = points.map((val, index) => {
-    const x = index * stepX;
-    // On inverse le Y car en SVG, le 0 est en haut et le 100% est en bas
-    // On garde une marge pour pas que les courbes lèchent les bords du cadre
-    const y = height - (val / 100) * (height - 8) - 4;
-    return { x, y };
-  });
-
-  // Génération de la ligne brisée (ou lissée)
-  let linePath = `M ${coords[0].x},${coords[0].y}`;
-  for (let i = 1; i < coords.length; i++) {
-    linePath += ` L ${coords[i].x},${coords[i].y}`;
+function getRandomInt(min: number, max: number) {
+  if (typeof window === "undefined" || !window.crypto) {
+    return Math.floor(Math.random() * (max - min) + min);
   }
 
-  // Génération de la zone de remplissage du dégradé (fermeture en bas du SVG)
-  const areaPath = `${linePath} L 100,40 L 0,40 Z`;
+  const range = max - min;
+  const randomBuffer = new Uint32Array(1);
 
-  // Position Y du dernier point à droite (pour la puce lumineuse)
-  const lastY = coords[coords.length - 1].y;
+  window.crypto.getRandomValues(randomBuffer);
 
-  return {
-    line: linePath,
-    area: areaPath,
-    lastY,
-  };
+  return min + (randomBuffer[0] % range);
+}
+
+function generateInitialData(pointsCount = 15) {
+  const now = Date.now();
+
+  return Array.from({ length: pointsCount }, (_, index) => ({
+    x: now - (pointsCount - index) * 5000,
+    y: getRandomInt(10, 50),
+  }));
+}
+
+const series = ref([
+  {
+    name: "CPU Load",
+    data: generateInitialData(),
+  },
+]);
+
+const currentCpuValue = computed(() => {
+  const data = series.value[0].data;
+  return data[data.length - 1]?.y ?? 0;
 });
+
+const chartOptions = {
+  chart: {
+    id: "cpu-chart",
+    type: "area",
+    toolbar: {
+      show: false,
+    },
+    zoom: {
+      enabled: false,
+    },
+    animations: {
+      enabled: false,
+    },
+    parentHeightOffset: 0,
+  },
+
+  dataLabels: {
+    enabled: false,
+  },
+
+  stroke: {
+    curve: "smooth",
+    width: 2,
+  },
+
+  colors: ["var(--color-primary-500)"],
+
+  fill: {
+    type: "gradient",
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.2,
+      opacityTo: 0,
+      stops: [0, 90, 100],
+    },
+  },
+  markers: {
+    size: 0,
+    hover: { size: 4 },
+  },
+
+  xaxis: {
+    type: "datetime",
+
+    tickAmount: 24,
+
+    labels: {
+      datetimeUTC: false,
+
+      datetimeFormatter: {
+        year: "HH:mm",
+        month: "HH:mm",
+        day: "HH:mm",
+        hour: "HH:mm",
+        minute: "HH:mm",
+      },
+
+      style: {
+        colors: "#a1a1aa",
+        fontSize: "10px",
+        fontFamily:
+          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+      },
+    },
+
+    axisBorder: {
+      show: false,
+    },
+
+    axisTicks: {
+      show: false,
+    },
+  },
+
+  yaxis: {
+    min: 0,
+    max: 100,
+    tickAmount: 12,
+
+    labels: {
+      show: false,
+    },
+
+    axisBorder: {
+      show: false,
+    },
+
+    axisTicks: {
+      show: false,
+    },
+  },
+
+  grid: {
+    show: true,
+    borderColor: "rgba(255, 255, 255, 0.03)",
+    strokeDashArray: 0,
+    position: "back",
+    xaxis: {
+      lines: { show: true },
+    },
+    yaxis: {
+      lines: { show: true },
+    },
+    padding: {
+      top: -25,
+      right: 0, // Décale la grille et la courbe pour manger la marge de droite
+      bottom: 0,
+      left: 0, // Décale la grille et la courbe pour manger la marge de gauche
+    },
+  },
+
+  tooltip: {
+    theme: "dark",
+
+    x: {
+      format: "HH:mm:ss",
+    },
+
+    y: {
+      formatter: (value: number) => `${value}%`,
+    },
+  },
+
+  legend: {
+    show: false,
+  },
+};
 </script>
 
 <template>
-  <div
-    class="bg-surface-card border border-border-subtle rounded-xl p-6 flex flex-col relative overflow-hidden group hover:border-primary/20 transition-all"
-  >
-    <div class="flex justify-between items-start mb-6">
-      <div class="flex flex-col gap-1">
-        <h3
-          class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-widest flex items-center gap-2"
-        >
-          <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-          CPU Load
-        </h3>
-        <p class="text-[11px] text-on-surface-variant">
-          Percent usage across all logical cores
-        </p>
-      </div>
-      <div class="text-right">
-        <span class="font-code-md text-2xl text-primary" id="cpu-stat">
-          {{ props.cpuValue.toFixed(1) }}%
-        </span>
-      </div>
-    </div>
+  <UCard class="h-100" :ui="{ body: 'h-full flex flex-col p-4' }">
+    <template #default>
+      <div class="flex justify-between items-start mb-3">
+        <div class="flex flex-col">
+          <h1
+            class="text-xl font-mono text-primary-400 uppercase flex items-center gap-2"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-400" />
+            CPU Load
+          </h1>
 
-    <div
-      class="flex-1 min-h-[80px] chart-grid rounded-lg border border-border-subtle/30 relative overflow-hidden"
-    >
-      <div class="absolute inset-0 pointer-events-none opacity-50">
-        <svg
-          class="w-full h-full"
-          preserveAspectRatio="none"
-          viewBox="0 0 100 40"
-        >
-          <path
-            :d="svgPaths.area"
-            fill="url(#cpuGrad)"
-            class="transition-all duration-300 ease-out"
+          <p class="text-sm text-on-surface-variant">
+            Percent usage across all logical cores
+          </p>
+        </div>
+
+        <div class="text-right">
+          <span class="font-mono text-3xl text-primary-400">
+            {{ currentCpuValue }}%
+          </span>
+        </div>
+      </div>
+
+      <div class="flex-1 min-h-15 text-primary">
+        <ClientOnly>
+          <apexchart
+            class="border rounded-md border-neutral-700"
+            ref="chartRef"
+            width="100%"
+            height="100%"
+            type="area"
+            :options="chartOptions"
+            :series="series"
+            style="color: var(--ui-bg-primary)"
           />
-          <path
-            :d="svgPaths.line"
-            fill="none"
-            stroke="var(--primary)"
-            stroke-width="1.5"
-            class="transition-all duration-300 ease-out"
-          />
-
-          <defs>
-            <linearGradient id="cpuGrad" x1="0%" x2="0%" y1="0%" y2="100%">
-              <stop
-                offset="0%"
-                style="stop-color: var(--primary); stop-opacity: 0.4"
-              ></stop>
-              <stop
-                offset="100%"
-                style="stop-color: var(--primary); stop-opacity: 0"
-              ></stop>
-            </linearGradient>
-          </defs>
-        </svg>
+        </ClientOnly>
       </div>
-
-      <div
-        class="absolute right-0 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_var(--primary)] transition-all duration-300 ease-out"
-        :style="{
-          top: `${(svgPaths.lastY / 40) * 100}%`,
-          transform: 'translate(25%, -50%)',
-        }"
-      ></div>
-    </div>
-  </div>
+    </template>
+  </UCard>
 </template>
