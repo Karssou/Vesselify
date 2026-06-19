@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 
-const chartRef = ref();
+const chartMemoryRef = ref();
 
 function getRandomInt(min: number, max: number) {
   if (typeof window === "undefined" || !window.crypto) {
@@ -27,7 +27,7 @@ function generateInitialData(pointsCount = 15) {
 
 const series = ref([
   {
-    name: "CPU Load",
+    name: "Memory Load",
     data: generateInitialData(),
   },
 ]);
@@ -62,7 +62,7 @@ const chartOptions = {
     width: 2,
   },
 
-  colors: ["var(--color-primary-500)"],
+  colors: ["var(--color-success-300)"],
 
   fill: {
     type: "gradient",
@@ -142,9 +142,9 @@ const chartOptions = {
     },
     padding: {
       top: -25,
-      right: 0, // Décale la grille et la courbe pour manger la marge de droite
+      right: 0,
       bottom: 0,
-      left: -10, // Décale la grille et la courbe pour manger la marge de gauche
+      left: -10,
     },
   },
 
@@ -175,19 +175,19 @@ const chartOptions = {
       <div class="flex justify-between items-start mb-3">
         <div class="flex flex-col">
           <h1
-            class="text-xl font-mono text-primary-400 uppercase flex items-center gap-2"
+            class="text-xl font-mono text-success-400 uppercase flex items-center gap-2"
           >
-            <span class="w-1.5 h-1.5 rounded-full bg-primary-400" />
-            CPU Load
+            <span class="w-1.5 h-1.5 rounded-full bg-success-400" />
+            Memory Load
           </h1>
 
           <p class="text-sm text-on-surface-variant">
-            Percent usage across all logical cores
+            Allocated physical RAM consumption
           </p>
         </div>
 
         <div class="text-right">
-          <span class="font-mono text-3xl text-primary-400">
+          <span class="font-mono text-3xl text-success-400">
             {{ currentCpuValue }}%
           </span>
         </div>

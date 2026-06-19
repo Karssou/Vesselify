@@ -6,8 +6,11 @@ definePageMeta({
 
 <template>
   <h1>Le dashboard</h1>
-  <DashboardCardsContainer />
-  <ChartsDonut label="Salut" :value="70" />
 
-  <DashboardCardsCPUMetrics class="max-w-3xl" />
+  <div class="inline-flex items-center gap-4">
+    <DashboardCardsCPUMetrics />
+    <DashboardCardsMemoryMetrics />
+    <DashboardCardsSystem />
+    <DashboardCardsContainer />
+  </div>
 </template>

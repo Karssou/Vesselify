@@ -16,7 +16,7 @@ const breadcrumbItems = ref<BreadcrumbItem[]>([
 </script>
 
 <template>
-  <UDashboardNavbar>
+  <UDashboardNavbar class="bg-neutral-950">
     <template #leading>
       <div class="flex items-center gap-4 flex-1 min-w-0">
         <Transition name="pop">
