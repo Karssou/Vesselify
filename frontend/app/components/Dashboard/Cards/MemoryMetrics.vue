@@ -175,7 +175,7 @@ const chartOptions = {
       <div class="flex justify-between items-start mb-3">
         <div class="flex flex-col">
           <h1
-            class="text-xl font-mono text-success-400 uppercase flex items-center gap-2"
+            class="text-xl font-bold font-mono text-success-400 uppercase flex items-center gap-2"
           >
             <span class="w-1.5 h-1.5 rounded-full bg-success-400" />
             Memory Load

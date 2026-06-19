@@ -123,7 +123,7 @@ const handleAction = (
       header: 'p-0 sm:px-0',
       body: 'p-0 sm:p-0',
     }"
-    class="bg-neutral-950 h-fit w-400 shadow-md"
+    class="bg-neutral-950 h-fit shadow-md"
   >
     <template #header>
       <div
