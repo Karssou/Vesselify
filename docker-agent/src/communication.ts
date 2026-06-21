@@ -7,6 +7,8 @@ const BACKEND_URL = process.env.API_URL;
 const SERVER_ID = process.env.SERVER_ID;
 const AGENT_TOKEN = process.env.AGENT_TOKEN;
 
+let wsInterval: NodeJS.Timeout | null = null;
+let httpInterval: NodeJS.Timeout | null = null;
 let isUsingHttpFallback = false;
 
 export function initAgentCommunication() {
@@ -18,6 +20,9 @@ export function initAgentCommunication() {
     extraHeaders: { Authorization: `Bearer ${AGENT_TOKEN}` },
     transports: ["websocket", "polling"],
     timeout: 5000,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 5000,
   });
 
   socket.on("connect", async () => {
@@ -32,18 +37,18 @@ export function initAgentCommunication() {
       console.log("Événement agent:register envoyé au backend !");
     }, 500);
 
-    socket.on(
-      "container:logs:request",
-      async (data: { containerId: string }) => {
-        if (!data.containerId) return;
+    // socket.on(
+    //   "container:logs:request",
+    //   async (data: { containerId: string }) => {
+    //     if (!data.containerId) return;
 
-        console.log(
-          `Demande de logs reçue pour le conteneur: ${data.containerId}`,
-        );
-        // On lance le streaming en lui passant l'instance actuelle du socket
-        await streamContainerLogs(data.containerId, socket);
-      },
-    );
+    //     console.log(
+    //       `Demande de logs reçue pour le conteneur: ${data.containerId}`,
+    //     );
+    //     // On lance le streaming en lui passant l'instance actuelle du socket
+    //     await streamContainerLogs(data.containerId, socket);
+    //   },
+    // );
 
     const wsInterval = setInterval(async () => {
       if (socket.disconnected) {
@@ -53,6 +58,20 @@ export function initAgentCommunication() {
       const metrics = await getServerMetrics();
       socket.emit("agent:metrics", { metrics });
     }, 5000);
+  });
+
+  // FALLBACK !!
+
+  socket.on("disconnect", (reason) => {
+    console.warn(
+      `Perte de connexion WS. Raison : ${reason}. En attente de reconnexion automatique...`,
+    );
+
+    // Nettoyage immédiat de la boucle WS puisqu'on est déconnecté
+    if (wsInterval) {
+      clearInterval(wsInterval);
+      wsInterval = null;
+    }
   });
 
   socket.on("connect_error", (error) => {
@@ -67,7 +86,7 @@ export function initAgentCommunication() {
     const httpInterval = setInterval(async () => {
       try {
         const metrics = await getServerMetrics();
-        console.info("PING de la transmission HTTP...");
+        console.info("[Fallback HTTP] Envoi des métriques...");
 
         const response = await fetch(`${BACKEND_URL}/agent/ping`, {
           method: "POST",
@@ -81,6 +100,7 @@ export function initAgentCommunication() {
         if (response.status === 401) {
           console.error("Token invalide, arrêt des pings.");
           clearInterval(httpInterval);
+          socket.disconnect();
         }
       } catch (err) {
         console.error(

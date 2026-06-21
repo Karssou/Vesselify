@@ -30,65 +30,78 @@ class WsService {
     if (!this.io) return
 
     this.io.on('connection', async (socket) => {
+      const serverId = socket.handshake.query.serverId as string
       const token =
         socket.handshake.headers['authorization']?.split(' ')[1] || socket.handshake.auth.token
-      const serverId = socket.handshake.query.serverId as string
 
-      if (!token || !serverId) {
+      // Sécurité de base : il faut au moins l'ID du serveur ciblé
+      if (!serverId) {
+        console.log(`❌ Connexion rejetée : Aucun serverId fourni (Socket: ${socket.id})`)
         socket.disconnect()
         return
       }
 
-      console.log(`Tentative de connexion WS pour le serveur : ${serverId}`)
+      await socket.join(`server:${serverId}`)
+      console.log(`Connexion établie. Socket ${socket.id} a rejoint la room : server:${serverId}`)
 
-      socket.on('agent:register', async (data) => {
-        console.log(`[First Ping] Reçu pour le serveur : ${serverId}`, data)
-        const { osName, osVersion, cpuModel, cpuCores, ramTotal, dockerVersion } = data
+      const isAgent = !!token
 
-        try {
-          const vps = await Server.find(serverId)
+      if (isAgent) {
+        console.log(`[Agent] Connecté pour le serveur : ${serverId}`)
 
-          if (!vps) {
-            console.error(`[First Ping] Serveur introuvable en BDD : ${serverId}`)
-            return
+        // ENREGISTREMENT INFORMATIONS SERVEURS
+
+        socket.on('agent:register', async (data) => {
+          console.log(`[First Ping] Reçu pour le serveur : ${serverId}`, data)
+          const { osName, osVersion, cpuModel, cpuCores, ramTotal, dockerVersion } = data
+
+          try {
+            const vps = await Server.find(serverId)
+
+            if (!vps) {
+              console.error(`[First Ping] Serveur introuvable en BDD : ${serverId}`)
+              return
+            }
+
+            vps.merge({
+              osName,
+              osVersion,
+              cpuModel,
+              cpuCores,
+              ramTotal,
+              dockerVersion,
+              status: 'online',
+              lastPingAt: DateTime.now(),
+            })
+
+            await vps.save()
+            console.log(`[First Ping] Specs du serveur ${vps.name} enregistrées avec succès !`)
+
+            vps.status = 'online'
+            vps.lastPingAt = DateTime.now()
+            await vps.save()
+            console.log(`[Ping] Statut mis à jour pour le serveur ${vps.name}`)
+          } catch (error) {
+            console.error(`Erreur lors du traitement du First Ping :`, error)
           }
+        })
 
-          vps.merge({
-            osName,
-            osVersion,
-            cpuModel,
-            cpuCores,
-            ramTotal,
-            dockerVersion, // Pense à le rajouter si tu l'as mis en BDD !
-            status: 'online',
-            lastPingAt: DateTime.now(),
-          })
+        // CANAL DES METRICS DU SERVEUR
 
-          await vps.save()
-          console.log(`[First Ping] Specs du serveur ${vps.name} enregistrées avec succès !`)
-
-          vps.status = 'online'
-          vps.lastPingAt = DateTime.now()
-          await vps.save()
-          console.log(`[Ping] Statut mis à jour pour le serveur ${vps.name}`)
-        } catch (error) {
-          console.error(`Erreur lors du traitement du First Ping :`, error)
-        }
-      })
-
-      socket.on('agent:metrics', async (data: any) => {
-        try {
-          await AgentService.handlePing(token, serverId, data.metrics)
-
-          // Ecoute nuxt
-          this.io?.to(`server:${serverId}`).emit('front:metrics', data.metrics)
-        } catch (error) {
-          // Si le token est invalide, on vire l'agent
-          socket.disconnect()
-        }
-      })
-
-      // 3. Gestion de la déconnexion mécanique (crash de l'agent, coupure réseau)
+        socket.on('agent:metrics', async (data: any) => {
+          try {
+            await AgentService.handlePing(token, serverId, data.metrics)
+            if (this.io) {
+              this.io.to(`server:${serverId}`).emit('front:metrics', data.metrics)
+            }
+          } catch (error) {
+            // Si le token est invalide, on vire l'agent
+            socket.disconnect()
+          }
+        })
+      } else {
+        console.log(`[CLIENT] Connecté en écoute sur le serveur : ${serverId}`)
+      }
       socket.on('disconnect', () => {
         console.log(`❌ Connexion WS fermée pour le serveur : ${serverId}`)
       })
@@ -96,6 +109,5 @@ class WsService {
   }
 }
 
-// On exporte une instance unique (Singleton)
 const wsService = new WsService()
 export default wsService
